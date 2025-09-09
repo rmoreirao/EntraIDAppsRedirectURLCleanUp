@@ -10,15 +10,15 @@ function missingHTTPUrl {
         return $false
     }
     
-    # Try to resolve domain
     try {
-        $res = Resolve-DnsName ([System.Uri] $url).Host -ErrorAction Stop
-    }
-    catch [System.ComponentModel.Win32Exception] {
-        return $true
+        # Extract the host and attempt DNS resolution
+        $urlHost = ([System.Uri]$url).Host
+        $null = [System.Net.Dns]::GetHostAddresses($urlHost)
+        return $false  # Domain resolves successfully
     }
     catch {
-        return $false
+        Write-Host "Failed to resolve domain for ${urlHost}: $($_.Exception.Message)"
+        return $true   # Domain doesn't resolve
     }
     
     return $false
@@ -68,6 +68,7 @@ foreach ($app in $apps) {
     if ([string]::IsNullOrEmpty($app.Spa.RedirectUri) -and
         [string]::IsNullOrEmpty($app.PublicClient.RedirectUri) -and
         [string]::IsNullOrEmpty($app.Web.RedirectUri)) {
+        Write-Host " No reply URL defined, skipping"
         continue
     }
     
