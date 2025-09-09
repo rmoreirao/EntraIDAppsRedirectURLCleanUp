@@ -52,6 +52,9 @@ function getOAuthResourceName {
 # Connect to Azure
 # Connect-AzAccount -AuthScope MicrosoftGraphEndpointResourceId
 
+Write-Host "Listing Entra ID Apps with abusable Reply URLs (HTTP/S URL defined but domain not resolvable)"
+Write-Host "---------------------------------------------------------------------"
+
 # Load Application URL data from tenant
 $apps = Get-AzADApplication
 
