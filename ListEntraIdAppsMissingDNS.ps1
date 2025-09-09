@@ -59,6 +59,8 @@ $apps = Get-AzADApplication
 $appsAbusableReplyURL = @()
 
 foreach ($app in $apps) {
+    Write-Host "Checking App Display Name: $($app.displayName), AppId: $($app.Appid)"
+
     # Skip apps which don't have reply URL defined
     if ([string]::IsNullOrEmpty($app.Spa.RedirectUri) -and
         [string]::IsNullOrEmpty($app.PublicClient.RedirectUri) -and
@@ -93,7 +95,7 @@ foreach ($app in $apps) {
         continue
     }
     
-    Write-Host "App Display Name: $($app.displayName), AppId: $($app.Appid)"
+    Write-Host "[RISK] App Display Name: $($app.displayName), AppId: $($app.Appid)"
     Write-Host " Abusable reply URL"
     foreach ($appAbusableReplyURL in $appAbusableReplyURLs) {
         Write-Host " $($appAbusableReplyURL.url) ($($appAbusableReplyURL.type))"
