@@ -1,4 +1,11 @@
 
+ 
+# This script scans Azure AD applications for security vulnerabilities in redirect URLs
+# that could lead to tenant takeover attacks through domain hijacking and misconfigurations.
+
+# SECURITY VALIDATION FUNCTIONS
+
+# DNS Resolution Validation - Detects unresolvable domains that attackers could register
 function missingHTTPUrl {
     param (
         [string]$url
@@ -44,6 +51,7 @@ function missingHTTPUrl {
     return $false
 }
 
+# Insecure Protocol Detection - Identifies HTTP URLs vulnerable to interception
 function isInsecureHTTP {
     param (
         [string]$url
@@ -56,6 +64,7 @@ function isInsecureHTTP {
     return $false
 }
 
+# Permission Analysis - Extracts OAuth2 scopes and resource access details
 function getOAuthResourceName {
     param (
         [PSObject]$resources
@@ -81,6 +90,9 @@ function getOAuthResourceName {
         Write-Host
     }
 }
+
+# MAIN SECURITY SCAN EXECUTION
+
 # Connect to Azure
 # Connect-AzAccount -AuthScope MicrosoftGraphEndpointResourceId
 
@@ -111,10 +123,11 @@ foreach ($app in $apps) {
         continue
     }
     
-    # Check if their reply URL's domain is defined and is abusable
+    # Check if their reply URL's domain is defined and is abusable (DNS Resolution Validation)
     $appAbusableReplyURLs = @()
     $insecureHttpUrls = @()
     
+    # Validate SPA (Single Page Application) redirect URIs
     $app.Spa.RedirectUri | ForEach-Object {
         if (missingHTTPUrl -url $_) {
             $appAbusableReplyURLs += [PSObject]@{ type = "spa"; url = $_; }
@@ -124,6 +137,7 @@ foreach ($app in $apps) {
         }
     }
     
+    # Validate Public Client redirect URIs
     $app.PublicClient.RedirectUri | ForEach-Object {
         if (missingHTTPUrl -url $_) {
             $appAbusableReplyURLs += [PSObject]@{ type = "publicClient"; url = $_; }
@@ -133,6 +147,7 @@ foreach ($app in $apps) {
         }
     }
     
+    # Validate Web Application redirect URIs (check implicit grant settings)
     $app.web.redirectUris | ForEach-Object {
         if ($app.web.ImplicitGrantSetting.EnableAccessTokenIssuance -and
             (missingHTTPUrl -url $_)) {
@@ -186,7 +201,7 @@ foreach ($app in $apps) {
     
     Write-Host ""
     
-    # Write App Permissions
+    # Write App Permissions (Permission Analysis)
     getOAuthResourceName -resources $app.RequiredResourceAccess
     Write-Host ""
     
