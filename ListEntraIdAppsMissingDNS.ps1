@@ -50,7 +50,7 @@ function getOAuthResourceName {
     }
 }
 # Connect to Azure
-Connect-AzAccount -AuthScope MicrosoftGraphEndpointResourceId
+# Connect-AzAccount -AuthScope MicrosoftGraphEndpointResourceId
 
 # Load Application URL data from tenant
 $apps = Get-AzADApplication
