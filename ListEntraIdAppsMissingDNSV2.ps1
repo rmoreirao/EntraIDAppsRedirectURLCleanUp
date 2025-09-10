@@ -181,26 +181,8 @@ foreach ($app in $apps) {
     if ($appAbusableReplyURLs.Count -eq 0) {
         continue
     }
-    
-    # Write-Host "[RISK] App Display Name: $($app.displayName), AppId: $($app.Appid)"
-    # Write-Host " Abusable reply URL"
-    # foreach ($appAbusableReplyURL in $appAbusableReplyURLs) {
-    #     Write-Host " $($appAbusableReplyURL.url) ($($appAbusableReplyURL.type))"
-    # }
-    
-    # # Report insecure HTTP URLs
-    # if ($insecureHttpUrls.Count -gt 0) {
-    #     Write-Host " Insecure HTTP URLs:"
-    #     foreach ($httpUrl in $insecureHttpUrls) {
-    #         Write-Host " $($httpUrl.url) ($($httpUrl.type))"
-    #     }
-    # }
-    
-    Write-Host ""
-    
     # Write App Permissions (Permission Analysis)
     $oauthPermissions = getOAuthResourceName -resources $app.RequiredResourceAccess
-    Write-Host ""
     
     # Add to results for CSV export
     $riskDetails = @{
